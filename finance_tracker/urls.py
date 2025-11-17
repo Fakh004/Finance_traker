@@ -9,5 +9,5 @@ urlpatterns = [
     path('<int:pk>/delete/', delete_transaction, name='delete-transaction'),
     path('all/', transaction_list, name='transaction_list'),
     path('profile/', profile_view, name='profile'),
-    path('profile/edit/', edite_profile, name='edit-profile'),
+    path('profile/edit/', edit_profile, name='edit-profile'),
 ]
