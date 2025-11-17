@@ -1,0 +1,60 @@
+body {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    font-family: 'Inter', sans-serif;
+}
+
+.profile-edit-card {
+    width: 100%;
+    max-width: 500px;
+    background: rgba(30, 30, 50, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 0 40px rgba(0, 123, 255, 0.5);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+}
+
+.profile-edit-card:hover {
+    transform: translateY(-5px);
+}
+
+.form-control {
+    border-radius: 10px;
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    border: 1px solid #555;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 10px #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #0d6efd, #6610f2);
+    border: none;
+    box-shadow: 0 0 20px rgba(13, 110, 253, 0.5);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(13, 110, 253, 0.8);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(108, 117, 125, 0.5);
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(108, 117, 125, 0.8);
+}
+
+label {
+    font-weight: 600;
+    color: #00d1ff;
+}

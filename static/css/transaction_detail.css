@@ -1,0 +1,78 @@
+  body {
+            font-family: "Inter", Arial, sans-serif;
+            background: linear-gradient(135deg, #0d1117, #1b2330);
+            margin: 0;
+            padding: 40px;
+            color: #e5e7eb;
+    }
+
+.container {
+            max-width: 550px;
+            margin: 0 auto;
+            background: #161b22;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.6s ease;
+    }
+
+h2 {
+        font-size: 26px;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #58a6ff;
+    }
+
+.detail-item {
+            background: #1f2937;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+    .detail-item span {
+            font-weight: bold;
+            color: #93c5fd;
+        }
+
+    .actions {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+    a {
+            display: inline-block;
+            padding: 10px 18px;
+            margin: 0 6px;
+            background-color: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: 0.25s ease;
+        }
+
+    a:hover {
+            background-color: #60a5fa;
+            transform: translateY(-2px);
+        }
+
+    .delete-btn {
+            background-color: #ef4444;
+        }
+
+    .delete-btn:hover {
+            background-color: #f87171;
+        }
+
+    @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }

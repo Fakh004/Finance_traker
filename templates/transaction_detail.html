@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/transaction_detail.css' %}">
+</head>
+<body>
+       <div class="container">
+        <h2>Transaction Detail</h2>
+
+        <div class="detail-item"><span>User:</span> {{ transaction.user.username }}</div>
+        <div class="detail-item"><span>Type:</span> {{ transaction.transaction_type }}</div>
+        <div class="detail-item"><span>Amount:</span> {{ transaction.amount }}</div>
+        <div class="detail-item"><span>Date:</span> {{ transaction.transacton_date }}</div>
+        <div class="detail-item"><span>Description:</span> {{ transaction.description }}</div>
+
+        <div class="actions">
+            <a href="{% url 'edit-transaction' transaction.id %}" style="background-color: orange;">Edit</a>
+            <a class="delete-btn" href="{% url 'delete-transaction' transaction.id %}">Delete</a>
+            <a href="{% url 'get_transaction' %}">Back</a>
+        </div>
+    </div> 
+</body>
+</html>
+
+
