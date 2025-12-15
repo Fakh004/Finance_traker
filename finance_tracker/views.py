@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from .models import Transaction, Balance, UserProfile
 from decimal import Decimal
 from django.utils import timezone
+from decimal import InvalidOperation
 
 def user_required(request):
     if not request.user.is_authenticated:
@@ -16,7 +17,6 @@ def transaction_list(request):
 
     transactions = Transaction.objects.filter(user=request.user)
 
-    # filter po sume
     amount = request.GET.get("amount")
     if amount:
         try:
@@ -25,12 +25,10 @@ def transaction_list(request):
         except:
             pass
 
-    # poisk po opisanie
     search_desc = request.GET.get("search")
     if search_desc:
         transactions = transactions.filter(description__icontains=search_desc)
 
-    # filter tolko za segodnya
     today = timezone.now().date()
     if request.GET.get("today_only") == "1":
         transactions = transactions.filter(transaction_date__date=today)
@@ -48,7 +46,6 @@ def add_transaction(request):
 
     user_balance, _ = Balance.objects.get_or_create(user=request.user)
 
-    # danigora iz form megirem
     try:
         amount = Decimal(request.POST.get("amount"))
     except:
@@ -57,11 +54,9 @@ def add_transaction(request):
     transaction_type = request.POST.get("transaction_type")
     description = request.POST.get("description")
 
-    # balansa proverka meknem
     if transaction_type == "EXPENSE" and user_balance.amount < amount:
         return HttpResponse("Not enough balance for this expense")
 
-    # tranzakciya mesozem
     tx = Transaction.objects.create(
         transaction_type=transaction_type,
         amount=amount,
@@ -69,7 +64,6 @@ def add_transaction(request):
         user=request.user
     )
 
-    # balansa obnovit meknem
     if transaction_type == "EXPENSE":
         user_balance.amount -= amount
     else:
@@ -92,51 +86,36 @@ def transaction_detail(request, pk):
     return render(request, "transaction_detail.html", {"transaction": tx})
 
 
-def update_transaction(request, pk):
-    auth = user_required(request)
-    if auth:
-        return auth
 
+def transaction_edit(request, pk):
     tx = Transaction.objects.filter(id=pk, user=request.user).first()
     if not tx:
-        return HttpResponse("Not found")
+        return HttpResponse("Transaction not found")
 
     if request.method == "GET":
         return render(request, "create.html", {"transaction": tx})
 
-    balance = Balance.objects.get_or_create(user=request.user)[0]
-
-    if tx.transaction_type == "EXPENSE":
-        balance.amount += tx.amount
-    else:
-        balance.amount -= tx.amount
-
-    #noviy daniora megirem
-    new_type = request.POST.get("transaction_type", tx.transaction_type)
     try:
-        new_amount = Decimal(request.POST.get("amount", tx.amount))
+        new_amount = Decimal(request.POST.get("amount"))
+        new_type = request.POST.get("transaction_type", "").upper()
     except:
-        return HttpResponse("Invalid amount")
-    new_desc = request.POST.get("description", tx.description)
+        return HttpResponse("Invalid data")
 
-    # balasna proverka meknem baroi raskhod
-    if new_type == "EXPENSE" and balance.amount < new_amount:
-        return HttpResponse("Not enough balance for this expense")
-
-    if new_type == "EXPENSE":
-        balance.amount -= new_amount
-    else:
-        balance.amount += new_amount
-
-    # obnovit tranzaksiya
-    tx.transaction_type = new_type
+    description = request.POST.get("description", "")
+    
     tx.amount = new_amount
-    tx.description = new_desc
+    tx.transaction_type = new_type
+    tx.description = description
 
-    balance.save()
-    tx.save()
+    try:
+        tx.save()  
+    except ValueError as e:
+        return HttpResponse(str(e))
 
-    return redirect("transaction_detail", pk=tx.id)
+    return redirect("get_transaction")
+
+
+
 
 
 
@@ -152,18 +131,17 @@ def delete_transaction(request, pk):
     if request.method == "GET":
         return render(request, "confirm_delete.html", {"transaction": tx})
 
-    balance = Balance.objects.get_or_create(user=request.user)[0]
+    balance, _ = Balance.objects.get_or_create(user=request.user)
 
-
-    if tx.transaction_type == 'EXPENSE':
+    if tx.transaction_type.upper() == 'EXPENSE':
         balance.amount += tx.amount
-    else:  # INCOME
+    elif tx.transaction_type.upper() == 'INCOME':
         balance.amount -= tx.amount
-
     balance.save()
-    tx.delete()
 
+    tx.delete()
     return redirect("get_transaction")
+
 
 
 
@@ -176,7 +154,6 @@ def get_transaction(request):
 
     transactions = Transaction.objects.filter(user=request.user).order_by('-transaction_date')
 
-    # filter po summe
     amount = request.GET.get("amount")
     if amount:
         try:
@@ -185,12 +162,10 @@ def get_transaction(request):
         except:
             pass
 
-    # filter po opisanie
     search_desc = request.GET.get("search")
     if search_desc:
         transactions = transactions.filter(description__icontains=search_desc)
 
-    # filer tolko segodnya
     if request.GET.get("today_only") == "1":
         today = timezone.now().date()
         transactions = transactions.filter(transaction_date__date=today)
@@ -200,7 +175,7 @@ def get_transaction(request):
             'user': request.user,
             'balance': balance,
             'transactions': transactions,
-            'request': request,  # нужно для сохранения значений в форме фильтра
+            'request': request, 
         }
     )
 
@@ -209,9 +184,7 @@ def profile_view(request):
     auth = user_required(request)
     if auth:
         return auth
-
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
-
     return render(request, "profile.html", {"user": request.user, "profile": profile})
 
 

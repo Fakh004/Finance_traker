@@ -17,19 +17,25 @@ class Transaction(models.Model):
     user = models.ForeignKey('CustomUser', related_name="transactions", on_delete=models.CASCADE, verbose_name="User")
 
     def save(self, *args, **kwargs):
-        balance = Balance.objects.filter(user=self.user).first()
-        if not balance:
-            raise ValueError("Balance does not exist for this user")
+     balance, _ = Balance.objects.get_or_create(user=self.user)
 
-        if self.transaction_type == "EXPENSE":
-            if balance.amount < self.amount:
-                raise ValueError("Not enough balance for this expense")
-            balance.amount -= self.amount
+     if self.pk:  
+        old_tx = Transaction.objects.get(pk=self.pk)
+        if old_tx.transaction_type == "EXPENSE":
+            balance.amount += old_tx.amount
         else:
-            balance.amount += self.amount
+            balance.amount -= old_tx.amount
 
-        balance.save()
-        super().save(*args, **kwargs)
+     if self.transaction_type == "EXPENSE":
+        if balance.amount < self.amount:
+            raise ValueError("Not enough balance for this expense")
+        balance.amount -= self.amount
+     else:
+        balance.amount += self.amount
+
+     balance.save()
+     super().save(*args, **kwargs)
+
 
     def __str__(self):
         return f"{self.transaction_type} | {self.amount} | {self.user}"
